@@ -1,0 +1,59 @@
+﻿<div class="modal-overlay @(IsVisible ? "visible" : "")">
+    <div class="modal-container animate__animated animate__zoomIn">
+        <button class="close-button" @onclick="OnClose">×</button>
+
+        <h2>Request a Demo</h2>
+
+        <EditForm Model="Request" OnValidSubmit="HandleSubmit">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="form-group">
+                <label for="name">Full Name</label>
+                <InputText id="name" @bind-Value="Request.Name" class="form-control" />
+                <ValidationMessage For="@(() => Request.Name)" />
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <InputText id="email" @bind-Value="Request.Email" class="form-control" />
+                <ValidationMessage For="@(() => Request.Email)" />
+            </div>
+
+            <div class="form-group">
+                <label for="company">Company</label>
+                <InputText id="company" @bind-Value="Request.Company" class="form-control" />
+                <ValidationMessage For="@(() => Request.Company)" />
+            </div>
+
+            <div class="form-group">
+                <label for="message">Message (Optional)</label>
+                <InputTextArea id="message" @bind-Value="Request.Message" class="form-control" rows="3" />
+            </div>
+
+            <button type="submit" class="submit-button" disabled="@isSubmitting">
+                @(isSubmitting ? "Submitting..." : "Submit Request")
+            </button>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public EventCallback OnClose { get; set; }
+
+    [Parameter]
+    public EventCallback<DemoRequest> OnSubmit { get; set; }
+
+    private DemoRequest Request { get; set; } = new();
+    private bool isSubmitting = false;
+
+    public bool IsVisible => true; // Always visible when rendered
+
+    private async Task HandleSubmit()
+    {
+        isSubmitting = true;
+        await OnSubmit.InvokeAsync(Request);
+        isSubmitting = false;
+    }
+}

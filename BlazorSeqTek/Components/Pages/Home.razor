@@ -1,7 +1,130 @@
 ﻿@page "/"
+@using Microsoft.JSInterop
+@* @layout MainLayout *@
+@* @inject NavigationManager NavigationManager *@
+@* @inject IJSRuntime JS *@
+@implements IDisposable
 
-<PageTitle>Home</PageTitle>
+<div class="landing-page">
+    <section class="hero animate__animated animate__fadeIn">
+        <h1>Give Your Customers the Support they Deserve</h1>
+        <p class="subtitle">Make customers happy and scale customer service without increasing unit costs.</p>
+    </section>
 
-<h1>Hello, world!</h1>
+    <div class="divider"></div>
 
-Welcome to your new app.
+    <section class="stats-section">
+        <div class="stat-box animate__animated animate__fadeInUp">
+            <div class="stat-value">60%</div>
+            <div class="stat-label">Scalable source</div>
+            <div class="stat-sublabel">Waste Owner:</div>
+            <div class="stat-sublabel">wasteowner.git</div>
+        </div>
+    </section>
+
+    <section class="value-prop animate__animated animate__fadeIn">
+        <p>Scale customer service without increasing unit cost</p>
+    </section>
+
+    <section class="big-numbers">
+        <div class="big-number animate__animated animate__fadeInLeft">
+            <div class="number">15,337</div>
+            <div class="number-label">Happy Customers</div>
+        </div>
+        <div class="big-number animate__animated animate__fadeInRight">
+            <div class="number">240,273</div>
+            <div class="number-label">Issues Resolved</div>
+        </div>
+    </section>
+
+    <section class="success-rate animate__animated animate__fadeIn">
+        <div class="percentage">99%</div>
+        <div class="success-label">Customer Satisfaction</div>
+    </section>
+
+    <section class="framework">
+        <h2 class="animate__animated animate__fadeIn">Our framework:</h2>
+        <ul>
+            <li class="animate__animated animate__fadeIn" style="animation-delay: 0.1s;">
+                <strong>RECIPIENT NAME:</strong>
+                <p>In the case of a client, you can use your own name to address this issue.</p>
+            </li>
+            <li class="animate__animated animate__fadeIn" style="animation-delay: 0.2s;">
+                <strong>LIST OF SERVICES:</strong>
+                <p>You can use your own name to address this issue.</p>
+            </li>
+            <li class="animate__animated animate__fadeIn" style="animation-delay: 0.3s;">
+                <strong>REQUISITE:</strong>
+                <p>You can use your own name to address this issue.</p>
+            </li>
+            <li class="animate__animated animate__fadeIn" style="animation-delay: 0.4s;">
+                <strong>SUPPORT:</strong>
+                <p>You can use your own name to address this issue.</p>
+            </li>
+        </ul>
+    </section>
+
+    <section class="demo-request animate__animated animate__fadeIn">
+        <button class="demo-button" @onclick="ShowDemoModal">Request a demo</button>
+    </section>
+
+    @if (showModal)
+    {
+        <DemoModal OnClose="HideDemoModal" OnSubmit="HandleDemoRequest" />
+    }
+</div>
+
+@code {
+    private bool showModal = false;
+    private DotNetObjectReference<Home>? objRef;
+    private IJSObjectReference? module;
+
+    [Inject]
+    private IJSRuntime JS { get; set; } = default!;
+    [Inject]
+    private NavigationManager NavigationManager { get; set; } = default!;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/animationhandler.js");
+                objRef = DotNetObjectReference.Create(this);
+                await module.InvokeVoidAsync("initializeAnimations", objRef);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading animations: {ex.Message}");
+            }
+        }
+    }
+
+    private void ShowDemoModal()
+    {
+        showModal = true;
+        StateHasChanged();
+    }
+
+    private void HideDemoModal()
+    {
+        showModal = false;
+        StateHasChanged();
+    }
+
+    private async Task HandleDemoRequest(DemoRequest request)
+    {
+        // Simulate API call
+        await Task.Delay(1000);
+
+        HideDemoModal();
+        NavigationManager.NavigateTo("/demo-requested");
+    }
+
+    public void Dispose()
+    {
+        objRef?.Dispose();
+        module?.DisposeAsync().AsTask();
+    }
+}

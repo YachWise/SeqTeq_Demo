@@ -8,4 +8,10 @@
         </AuthorizeRouteView>
         <FocusOnNavigate RouteData="routeData" Selector="h1" />
     </Found>
+    <NotFound>
+        <PageTitle>Page Not Found</PageTitle>
+        <LayoutView Layout="@typeof(Layout.MainLayout)">
+            <p role="alert"> Sorry, there's nothing on this page yet!</p>
+        </LayoutView>
+    </NotFound>
 </Router>
