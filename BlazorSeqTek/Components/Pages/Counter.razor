@@ -1,19 +1,42 @@
 ﻿@page "/counter"
-@rendermode InteractiveServer
-
-<PageTitle>Counter</PageTitle>
+@inject SessionStorageService SessionStorage
 
 <h1>Counter</h1>
 
-<p role="status">Current count: @currentCount</p>
+<p>Current count: @currentCount</p>
+<p>Stored count: @storedCount</p>
 
-<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+<button class="btn btn-primary" @onclick="IncrementCount">Increment</button>
+<button class="btn btn-secondary" @onclick="SaveCount">Save to Session</button>
+<button class="btn btn-info" @onclick="LoadCount">Load from Session</button>
 
 @code {
     private int currentCount = 0;
+    private int? storedCount = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadCount();
+    }
 
     private void IncrementCount()
     {
+        Console.WriteLine("Session Storage Current Count: " + currentCount);
         currentCount++;
+    }
+
+    private async Task SaveCount()
+    {
+        await SessionStorage.SetItemAsync("count", currentCount);
+        storedCount = currentCount;
+    }
+
+    private async Task LoadCount()
+    {
+        storedCount = await SessionStorage.GetItemAsync<int?>("count");
+        if (storedCount.HasValue)
+        {
+            currentCount = storedCount.Value;
+        }
     }
 }

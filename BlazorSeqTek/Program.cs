@@ -1,6 +1,7 @@
 using BlazorSeqTek.Components;
 using BlazorSeqTek.Components.Account;
 using BlazorSeqTek.Data;
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -23,6 +24,19 @@ builder.Services.AddAuthentication(options =>
 })
     .AddIdentityCookies();
 
+//for Session Storage Implementation of Sudoku Game
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+builder.Services.AddScoped<SudokuService>();
+builder.Services.AddScoped<SessionStorageService>();
+
+
+
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
@@ -32,6 +46,9 @@ builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.Requ
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddSignInManager()
     .AddDefaultTokenProviders();
+
+builder.Services.AddDistributedMemoryCache();
+
 
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 
@@ -52,7 +69,12 @@ else
 app.UseHttpsRedirection();
 
 app.UseStaticFiles();
+
+
+//for session storage implementation of sudoku game
+app.UseRouting();
 app.UseAntiforgery();
+app.UseSession();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
@@ -61,3 +83,7 @@ app.MapRazorComponents<App>()
 app.MapAdditionalIdentityEndpoints();
 
 app.Run();
+
+
+
+
