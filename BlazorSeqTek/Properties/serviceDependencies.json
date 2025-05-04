@@ -1,5 +1,15 @@
 {
   "dependencies": {
+    "secrets1": {
+      "type": "secrets",
+      "connectionId": "VaultUri",
+      "dynamicId": null
+    },
+    "redis1": {
+      "type": "redis",
+      "connectionId": "CacheConnection",
+      "dynamicId": null
+    },
     "mssql1": {
       "type": "mssql",
       "connectionId": "ConnectionStrings:DefaultConnection"

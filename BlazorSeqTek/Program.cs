@@ -39,7 +39,7 @@ builder.Services.AddSession(options =>
 });
 builder.Services.AddScoped<SudokuService>();
 builder.Services.AddScoped<SessionStorageService>();
-
+builder.Services.AddScoped<UserAccountBLL>();
 
 
 builder.Configuration.AddAzureKeyVault(
@@ -52,14 +52,17 @@ builder.Services.AddStackExchangeRedisCache(options =>
     options.InstanceName = "SeqTekDemo";
 });
 
+
 Console.WriteLine($"Redis Connection: {builder.Configuration["RedisConnection"]}");
 
 
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+var connectionString = builder.Configuration["DefaultConnection"] ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+
+Console.WriteLine("MySQL DB Conn String: " + connectionString);
 
 builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>()

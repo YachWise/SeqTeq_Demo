@@ -1,0 +1,78 @@
+﻿@page "/crud"
+
+<h3>CRUD Operations</h3>
+
+<div>
+    <h4>Create Account</h4>
+    <input @bind="NewAccount.UserName" placeholder="Username" />
+    <input @bind="NewAccount.Email" placeholder="Email" />
+    <button @onclick="CreateAccount">Create</button>
+</div>
+
+<div>
+    <h4>Read Account</h4>
+    <input @bind="ReadAccountId" placeholder="Account ID" />
+    <button @onclick="ReadAccount">Read</button>
+    <p>@ReadAccountResult</p>
+</div>
+
+<div>
+    <h4>Update Account</h4>
+    <input @bind="UpdateAccountId" placeholder="Account ID" />
+    <input @bind="UpdateAccount.UserName" placeholder="New Username" />
+    <input @bind="UpdateAccount.Email" placeholder="New Email" />
+    <button @onclick="UpdateAccountDetails">Update</button>
+</div>
+
+<div>
+    <h4>Delete Account</h4>
+    <input @bind="DeleteAccountId" placeholder="Account ID" />
+    <button @onclick="DeleteAccount">Delete</button>
+</div>
+
+@code {
+    private UserAccountModel NewAccount = new UserAccountModel();
+    private Guid ReadAccountId;
+    private string ReadAccountResult = string.Empty;
+    private Guid UpdateAccountId;
+    private UserAccountModel UpdateAccount = new UserAccountModel();
+    private Guid DeleteAccountId;
+
+    [Inject]
+    private UserAccountBLL UserAccountBLL { get; set; }
+
+    private async Task CreateAccount()
+    {
+        await UserAccountBLL.CreateAccount(NewAccount);
+        NewAccount = new UserAccountModel(); // Reset form
+
+        Console.WriteLine("Created Account!");
+    }
+
+    private async Task ReadAccount()
+    {
+        var account = await UserAccountBLL.GetAccountById(ReadAccountId);
+        ReadAccountResult = account != null
+            ? $"Username: {account.UserName}, Email: {account.Email}"
+            : "Account not found.";
+    }
+
+    private async Task UpdateAccountDetails()
+    {
+        UpdateAccount.Id = UpdateAccountId;
+        var updatedAccount = await UserAccountBLL.UpdateAccountAsync(UpdateAccount);
+        if (updatedAccount != null)
+        {
+            UpdateAccount = new UserAccountModel(); // Reset form
+        }
+    }
+
+    private async Task DeleteAccount()
+    {
+        var success = await UserAccountBLL.DeleteAccountAsync(DeleteAccountId);
+        if (success)
+        {
+            DeleteAccountId = Guid.Empty; // Reset form
+        }
+    }
+}
