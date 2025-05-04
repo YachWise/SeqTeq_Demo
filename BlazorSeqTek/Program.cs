@@ -5,6 +5,9 @@ using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Azure.Extensions.AspNetCore.Configuration.Secrets;
+using Azure.Identity;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,6 +40,20 @@ builder.Services.AddScoped<SessionStorageService>();
 
 
 
+builder.Configuration.AddAzureKeyVault(
+    new Uri("https://seqtekdemo.vault.azure.net/"),
+    new DefaultAzureCredential());
+
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration["RedisConnection"];
+    options.InstanceName = "SeqTekDemo";
+});
+
+Console.WriteLine($"Redis Connection: {builder.Configuration["RedisConnection"]}");
+
+
+
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
@@ -51,6 +68,8 @@ builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession();
 
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
+
+builder.Logging.AddConsole();
 
 var app = builder.Build();
 

@@ -398,3 +398,8 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+
+#Added by Jacob
+/BlazorSeqTek/appsettings.json
+/BlazorSeqTek/appsettings.Development.json
