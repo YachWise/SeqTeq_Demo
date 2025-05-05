@@ -59,7 +59,9 @@ Console.WriteLine($"Redis Connection: {builder.Configuration["RedisConnection"]}
 
 var connectionString = builder.Configuration["DefaultConnection"] ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString));
+    options.UseSqlServer(connectionString)
+              .EnableSensitiveDataLogging()
+              .LogTo(Console.WriteLine));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 Console.WriteLine("MySQL DB Conn String: " + connectionString);

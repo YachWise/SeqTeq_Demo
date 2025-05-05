@@ -29,6 +29,7 @@
 
     private async Task SaveCount()
     {
+       
         await SessionStorage.SetItemAsync("count", currentCount);
         storedCount = currentCount;
     }

@@ -1,33 +1,40 @@
 ﻿@page "/crud"
+@inject UserAccountBLL UserAccountBLL
+@rendermode InteractiveServer
 
 <h3>CRUD Operations</h3>
 
 <div>
     <h4>Create Account</h4>
-    <input @bind="NewAccount.UserName" placeholder="Username" />
-    <input @bind="NewAccount.Email" placeholder="Email" />
-    <button @onclick="CreateAccount">Create</button>
+    <input class="UserName_Form" @bind="NewAccount.UserName" placeholder="Username" />
+    <input class="Email_Form" @bind="NewAccount.Email" placeholder="Email" />
+    <button class="Create_Button" @onclick="CreateAccount">Create</button>
+    <p style="color: green;">@CreateAccountMessage</p> 
+
 </div>
 
 <div>
     <h4>Read Account</h4>
-    <input @bind="ReadAccountId" placeholder="Account ID" />
-    <button @onclick="ReadAccount">Read</button>
+    <input class="Read_Form" @bind="ReadAccountId" placeholder="Account ID" />
+    <button class="Read_Button" @onclick="ReadAccount">Read</button>
     <p>@ReadAccountResult</p>
+    <p style="color: green;">@ReadAccountMessage</p>
 </div>
 
 <div>
     <h4>Update Account</h4>
     <input @bind="UpdateAccountId" placeholder="Account ID" />
-    <input @bind="UpdateAccount.UserName" placeholder="New Username" />
-    <input @bind="UpdateAccount.Email" placeholder="New Email" />
-    <button @onclick="UpdateAccountDetails">Update</button>
+    <input class="UserName_Form" @bind="UpdateAccount.UserName" placeholder="New Username" />
+    <input class="Email_Form" @bind="UpdateAccount.Email" placeholder="New Email" />
+    <button class="Update_Button" @onclick="UpdateAccountDetails">Update</button>
+    <p style="color: green;">@UpdateAccountMessage</p>
 </div>
 
 <div>
     <h4>Delete Account</h4>
-    <input @bind="DeleteAccountId" placeholder="Account ID" />
-    <button @onclick="DeleteAccount">Delete</button>
+    <input class="DeleteAccForm" @bind="DeleteAccountId" placeholder="Account ID" />
+    <button class = "Delete_Button" @onclick="DeleteAccount">Delete</button>
+    <p style="color: green;">@DeleteAccountMessage</p>
 </div>
 
 @code {
@@ -37,42 +44,69 @@
     private Guid UpdateAccountId;
     private UserAccountModel UpdateAccount = new UserAccountModel();
     private Guid DeleteAccountId;
+    private string CreateAccountMessage = string.Empty;
+    private string ReadAccountMessage = string.Empty;
+    private string UpdateAccountMessage = string.Empty;
+    private string DeleteAccountMessage = string.Empty;
 
-    [Inject]
-    private UserAccountBLL UserAccountBLL { get; set; }
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+    }
 
     private async Task CreateAccount()
     {
         await UserAccountBLL.CreateAccount(NewAccount);
-        NewAccount = new UserAccountModel(); // Reset form
 
-        Console.WriteLine("Created Account!");
+        var newAccountGUID = NewAccount.Id;
+        CreateAccountMessage = $"Account created with ID: {newAccountGUID}";
+
+        NewAccount = new UserAccountModel(); // Reset form
     }
 
     private async Task ReadAccount()
     {
+        Console.WriteLine("Read Account!");
         var account = await UserAccountBLL.GetAccountById(ReadAccountId);
-        ReadAccountResult = account != null
-            ? $"Username: {account.UserName}, Email: {account.Email}"
-            : "Account not found.";
+        if (account != null)
+        {
+            ReadAccountResult = account != null
+                 ? $"Username: {account.UserName}, Email: {account.Email}"
+                 : "Account not found.";
+            ReadAccountMessage = $"Account Name: {account.UserName}";
+        }
+        else
+        {
+            ReadAccountMessage = "Account not found.";
+        }
+       
     }
 
     private async Task UpdateAccountDetails()
     {
+        Console.WriteLine("Update Account!");
         UpdateAccount.Id = UpdateAccountId;
         var updatedAccount = await UserAccountBLL.UpdateAccountAsync(UpdateAccount);
         if (updatedAccount != null)
         {
             UpdateAccount = new UserAccountModel(); // Reset form
+            UpdateAccountMessage = $"Account updated: {updatedAccount.Email}, {updatedAccount.UserName}";
         }
+       
     }
 
     private async Task DeleteAccount()
     {
+        Console.WriteLine("Delete Account!");
         var success = await UserAccountBLL.DeleteAccountAsync(DeleteAccountId);
         if (success)
         {
             DeleteAccountId = Guid.Empty; // Reset form
+            DeleteAccountMessage = "Account deleted successfully.";
+        }
+        else
+        {
+            DeleteAccountMessage = "Failed to delete account. Please check the ID.";
         }
     }
 }

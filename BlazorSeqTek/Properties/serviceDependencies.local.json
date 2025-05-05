@@ -15,11 +15,10 @@
       "connectionId": "CacheConnection",
       "dynamicId": null
     },
-    "mssql1": {
-      "secretStore": null,
-      "resourceId": null,
-      "type": "mssql.local",
-      "connectionId": "ConnectionStrings:DefaultConnection"
+    "mssql2": {
+      "secretStore": "LocalSecretsFile",
+      "type": "mssql.onprem",
+      "connectionId": "ConnectionStrings:DatabaseConnection"
     }
   }
 }
