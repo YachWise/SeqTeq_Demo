@@ -1,4 +1,6 @@
 ﻿@using System.Diagnostics
+@rendermode InteractiveServer
+
 <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
 
     <div class="container-fluid">
@@ -27,6 +29,16 @@
                 <li class="nav-item">
                     <NavLink class="nav-link" href="crud">
                         <span class="oi oi-list-rich" aria-hidden="true"></span> CRUD
+                    </NavLink>
+                </li>
+                <li class="nav-item">
+                    <NavLink class="nav-link" href="Account/Login">
+                        <span class="oi oi-list-rich" aria-hidden="true"></span> Login
+                    </NavLink>
+                </li>
+                <li class="nav-item">
+                    <NavLink class="nav-link" href="auth">
+                        <span class="oi oi-list-rich" aria-hidden="true"></span> Auth Required
                     </NavLink>
                 </li>
             </ul>

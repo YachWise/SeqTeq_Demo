@@ -41,7 +41,6 @@ builder.Services.AddScoped<SudokuService>();
 builder.Services.AddScoped<SessionStorageService>();
 builder.Services.AddScoped<UserAccountBLL>();
 
-
 builder.Configuration.AddAzureKeyVault(
     new Uri("https://seqtekdemo.vault.azure.net/"),
     new DefaultAzureCredential());
@@ -53,18 +52,12 @@ builder.Services.AddStackExchangeRedisCache(options =>
 });
 
 
-//Console.WriteLine($"Redis Connection: {builder.Configuration["RedisConnection"]}");
-
-
-
 var connectionString = builder.Configuration["DefaultConnection"] ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString)
               .EnableSensitiveDataLogging()
               .LogTo(Console.WriteLine));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
-
-//Console.WriteLine("MySQL DB Conn String: " + connectionString);
 
 builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>()
@@ -73,7 +66,6 @@ builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.Requ
 
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession();
-
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 
 builder.Logging.AddConsole();
@@ -93,13 +85,10 @@ else
 }
 
 app.UseHttpsRedirection();
-
 app.UseStaticFiles();
-
-
-//for session storage implementation of sudoku game
 app.UseRouting();
 app.UseSession();
+app.UseAuthorization();
 app.UseAntiforgery();
 
 app.MapRazorComponents<App>()
@@ -107,7 +96,6 @@ app.MapRazorComponents<App>()
 
 // Add additional endpoints required by the Identity /Account Razor components.
 app.MapAdditionalIdentityEndpoints();
-
 
 app.Run();
 
