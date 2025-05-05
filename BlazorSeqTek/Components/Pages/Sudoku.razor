@@ -1,6 +1,6 @@
 ﻿@page "/sudoku"
 @inject SudokuService SudokuService
-
+@rendermode InteractiveServer
 @attribute [StreamRendering]
 
 <PageTitle>Sudoku</PageTitle>
@@ -9,7 +9,7 @@
 
 @if (game.IsCompleted)
 {
-      <div class="alert alert-success">
+    <div class="alert alert-success">
         <h3>Congratulations! You solved the puzzle!</h3>
         <button class="btn btn-primary" @onclick="NewGame">Play Again</button>
     </div>
@@ -44,21 +44,30 @@
     </table>
 </div>
 
+
+
 <div class="sudoku-controls mt-3">
     <button class="btn btn-secondary" @onclick="NewGame">New Game</button>
     <button class="btn btn-info" @onclick="CheckSolution">Check Solution</button>
     <button class="btn btn-danger" @onclick="ResetGame">Reset Board</button>
+    <button class="btn btn-warning" @onclick="ShowSolution">Show Solution (Cheater)</button>
 </div>
 
 
-<p>Demonstrates Session Storage</p>
+<p>Was meant to demonstrate session storage but it's a long story now it's just a functional sudoku game</p>
+<p style="color: @chosenColor;">@SudokuString</p>
 
 @code {
     private SudokuGame game = new();
+    private string SudokuString = string.Empty;
+    private string chosenColor = "red";
 
     protected override void OnInitialized()
     {
         game = SudokuService.GetGame();
+
+        var solution = game.Solution;
+        Console.WriteLine(solution);
     }
 
     private string GetCellClass(int row, int col)
@@ -79,20 +88,44 @@
         return string.Join(" ", classes);
     }
 
+    private void ShowSolution()
+    {
+        for (int row = 0; row < 9; row++)
+        {
+            for (int col = 0; col < 9; col++)
+            {
+                game.Board[row, col] = game.Solution[row, col];
+            }
+        }
+
+        // Mark the game as completed
+        game.IsCompleted = true;
+
+        Console.WriteLine("Solution shown! loser.");
+    }
+
     private void CellChanged(int row, int col, ChangeEventArgs e)
     {
+        if (row < 0 || row >= 9 || col < 0 || col >= 9)
+        {
+            Console.WriteLine($"Invalid indices: row={row}, col={col}");
+            Console.WriteLine(e.Value);
+            return;
+        }
         if (!game.ImmutableCells[row, col])
         {
             game.Board[row, col] = string.IsNullOrEmpty(e.Value?.ToString()) ? null : int.Parse(e.Value.ToString()!);
             SudokuService.SaveGame(game);
             game.CheckCompletion();
         }
+
     }
 
     private void NewGame()
     {
         SudokuService.ResetGame();
         game = SudokuService.GetGame();
+        StateHasChanged();
     }
 
     private void ResetGame()
@@ -109,15 +142,22 @@
         }
 
         game.IsCompleted = false;
-        SudokuService.SaveGame(game);
+        StateHasChanged();
     }
 
     private void CheckSolution()
     {
         if (game.CheckCompletion())
         {
-            SudokuService.SaveGame(game);
+            SudokuString = "Congratulations! You solved the puzzle!";
+            chosenColor = "green";
         }
+        else
+        {
+            SudokuString = "Not even close, bud.";
+            chosenColor = "red"; 
+        }
+    
     }
 
 }

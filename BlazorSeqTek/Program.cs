@@ -53,7 +53,7 @@ builder.Services.AddStackExchangeRedisCache(options =>
 });
 
 
-Console.WriteLine($"Redis Connection: {builder.Configuration["RedisConnection"]}");
+//Console.WriteLine($"Redis Connection: {builder.Configuration["RedisConnection"]}");
 
 
 
@@ -64,7 +64,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
               .LogTo(Console.WriteLine));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-Console.WriteLine("MySQL DB Conn String: " + connectionString);
+//Console.WriteLine("MySQL DB Conn String: " + connectionString);
 
 builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>()

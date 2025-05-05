@@ -30,7 +30,7 @@ public class SudokuService
         }
 
         var newGame = SudokuGame.GenerateNewGame();
-        SaveGame(newGame);
+        //SaveGame(newGame);
         return newGame;
     }
 
@@ -73,8 +73,7 @@ public class SudokuGame
     public int?[,] Solution { get; set; } = new int?[9, 9];
     public bool[,] ImmutableCells { get; set; } = new bool[9, 9];
     public bool IsCompleted { get; set; }
-
-
+    
     public static SudokuGame GenerateNewGame()
     {
         var game = new SudokuGame();
@@ -149,6 +148,7 @@ public class SudokuGame
                 game.ImmutableCells[i, j] = true;
             }
         }
+
 
         var random = new Random();
         int removed = 0;
